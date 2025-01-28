@@ -5,20 +5,6 @@
 # Ignore compiled object files
 *.o
 
-# Ignore executables
-*.exe
-/STY25/assignment01-templates/p1/print
-/STY25/assignment01-templates/p2/parseint
-/STY25/tut01-templates/p1/greet
-/STY25/tut01-templates/p1/testlib.exe
-/STY25/tut01-templates/p2/countchr
-/STY25/vika2/assignment02-templates/p1/out
-/STY25/vika2/assignment02-templates/p2/execute
-/STY25/vika2/fork
-/STY25/vika2/new_program
-/STY25/vika2/templates-solution-tut02/p1/malloc
-/STY25/vika2/templates-solution-tut02/p1/malloc2
-
 # Ignore zip files
 *.zip
 
