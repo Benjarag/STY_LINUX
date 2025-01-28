@@ -1,0 +1,12 @@
+# For each line, do not change the left side (e.g. "s:"), but remove all but one label on the right side 
+# Part 2.1a
+a: RODATA DATA BSS STACK TEXT %RAX HEAP
+b: RODATA DATA BSS STACK TEXT %RAX HEAP
+s: RODATA DATA BSS STACK TEXT %RAX HEAP
+r: RODATA DATA BSS STACK TEXT %RAX HEAP
+# Part 2.1b
+ptr: RODATA DATA BSS STACK TEXT %RAX HEAP
+*ptr: RODATA DATA BSS STACK TEXT %RAX HEAP
+# Part 2.1c
+func: RODATA DATA BSS STACK TEXT %RAX HEAP
+return value: RODATA DATA BSS STACK TEXT %RAX HEAP
