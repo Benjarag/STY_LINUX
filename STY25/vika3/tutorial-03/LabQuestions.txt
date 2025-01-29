@@ -68,10 +68,17 @@ d. What quantitative metrics/criteria can be used to estimate the quality of a s
 e. What kind of hardware support is required for an operating system that implements a
     non-cooperative scheduling policy?
 
-    Timer Interrupts: To trigger context switches at the end of a timeslice.  
-    Privileged Mode: The OS must execute in kernel mode to enforce scheduling decisions.  
-    Memory Protection: Prevent user processes from modifying scheduler/interrupt logic.  
-    Atomic Instructions: For safe manipulation of scheduling queues (e.g., disabling interrupts during critical sections).  
+    Timer Interrupts: 
+        To trigger context switches at the end of a timeslice.  
+    
+    Privileged Mode: 
+        The OS must execute in kernel mode to enforce scheduling decisions.  
+    
+    Memory Protection: 
+        Prevent user processes from modifying scheduler/interrupt logic.  
+    
+    Atomic Instructions: 
+        For safe manipulation of scheduling queues (e.g., disabling interrupts during critical sections).  
 
 
 f. Discuss pros and cons of choosing a short timeslice length vs. choosing a longer times-
