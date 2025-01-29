@@ -1,0 +1,92 @@
+Lab 3.1: Scheduling Basics
+a. What is the purpose of scheduling?
+
+    The primary purpose of scheduling is maximizing CPU utilization, the goal is to keep the CPU as busy as possible
+    while, ensuring fairness by allocating CPU time equally among processes.
+    Optimizing performance by improving metrics like throughput, turnaround time and response time are a high priority in the utilization.
+    Its important to, cordinate CPU, I/O, and memory usage efficiently and support multitasking, by enabling concurrent execution of processes.        
+
+
+b. What is the difference between a long and short-term scheduler?
+
+    Long-Term Scheduler
+        controls the admission of processes into system, (multiprogramming)
+        runs infrequently (for example, when a process terminates)
+        focuses on balancing I/O-bound and CPU-bound processes
+
+    Short-Term Scheduler
+        Selects the next process to execute on the CPU from the ready queue
+        runs frequently (for example, during timer interrupts)
+        focuses on minimizing context/switch overhead and ensuring responsiveness
+
+
+c. Consider an operating system that supports the five task states “new”, “running”, “ready”,
+    “waiting”, and “terminated”. Depict the possible state transitions and the events that
+    cause them.
+
+    new -> ready:
+        Process is admitted by the long-term scheduler
+    
+    ready -> running:
+        Process is selected by the short-term scheduler (dispatch)
+    
+    running -> ready:
+        Timeout end of timeslice
+    
+    running -> waiting:
+        Process requests I/O or waits for an event (e.g., user input)
+    
+    waiting -> ready: 
+        I/O completes or event occurs
+    
+    running -> terminated: 
+        Process finishes execution or gets killed
+
+
+d. What quantitative metrics/criteria can be used to estimate the quality of a scheduling
+    policy?
+
+    CPU Utilization:
+        Percentage of time the CPU is busy.  
+    
+    Throughput: 
+        Number of processes completed per unit time.  
+    
+    Turnaround Time: 
+        Total time from submission to completion (finish time - arrival time).  
+    
+    Waiting Time: 
+        Total time a process spends in the ready queue.  
+    
+    Response Time: 
+        Time from submission to first response (critical for interactive systems).  
+    
+    Fairness: 
+        Equitable distribution of CPU time across processes.  
+
+
+e. What kind of hardware support is required for an operating system that implements a
+    non-cooperative scheduling policy?
+
+    Timer Interrupts: To trigger context switches at the end of a timeslice.  
+    Privileged Mode: The OS must execute in kernel mode to enforce scheduling decisions.  
+    Memory Protection: Prevent user processes from modifying scheduler/interrupt logic.  
+    Atomic Instructions: For safe manipulation of scheduling queues (e.g., disabling interrupts during critical sections).  
+
+
+f. Discuss pros and cons of choosing a short timeslice length vs. choosing a longer times-
+    lice length. What are common values for the length of a timeslice?
+
+    Short timeslice
+        Pros:
+            Better responsiveness for interactive tasks, reduces perceived latency
+        Cons:
+            Higher overhead due to frequent context switches
+
+    Long timeslice
+        Pros:
+            Lower context switching overhead, better for CPU bound tasks
+        Cons:
+            responsiveness for I/O bound tasks
+
+Common values for the lenght of the timeslice is like 10-200 milliseconds for winsows and linux systems
