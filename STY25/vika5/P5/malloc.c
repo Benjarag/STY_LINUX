@@ -166,7 +166,7 @@ static void *allocate_block(Block **update_next, Block *block, uint64_t new_size
 		block->size = new_size; // best fit block to the required size
 	}
 	block->next = NULL;
-	return (void *)(block + 1);
+	return &(block->data[0]);
 }
 
 void *my_malloc(uint64_t size)
@@ -198,7 +198,7 @@ void *my_malloc(uint64_t size)
 	        current = _firstFreeBlock;
             
             while (current) {
-                printf("Checking block at: %p with size: %lu\n", (void *)current, current->size);
+                printf("Checking block at: %p with size: %lu (BESTFIT)\n", (void *)current, current->size);
                 if (current->size >= size) { // large enough
                     if (!best_fit || current->size < best_fit->size) { // smaller size than the best_fit size
                         // change current to best fit
@@ -261,15 +261,15 @@ void *my_malloc(uint64_t size)
             selected_prev_next = NULL;
             
             while (!has_circled) {
-                printf("Checking block at: %p with size: %lu\n", (void *)curr, curr->size);
-                if (current->size >= size) { // large enough
+                printf("Checking block at: %p with size: %lu (NEXTIF)\n", (void *)curr, curr->size);
+                if (curr->size >= size) { // large enough
                     selected_block = curr; // select the current block
                     selected_prev_next = (prev == NULL) ? &_firstFreeBlock : &prev->next; // set the selected_prev_next to the prev next pointer, if prev is None then its the firstFreeBlock
                     printf("First fit block selected at: %p with size: %lu\n", (void *)curr, curr->size);
                     break;
                 }
                 prev = curr; // update prev to current
-                curr = current->next; // update current to next
+                curr = curr->next; // update current to next
                 if (curr == NULL) {
                     curr = _firstFreeBlock;
                 }
@@ -303,6 +303,30 @@ void *my_malloc(uint64_t size)
             }
             selected_block = worst_fit;
             selected_prev_next = worst_prev_next;
+            break;
+        }
+        default:
+        {
+            // Use best fit as default if allocation strategy is unknown or not recognized
+            Block *best_fit = NULL;
+            Block **best_prev_next = &_firstFreeBlock;
+            prev = NULL;
+            current = _firstFreeBlock;
+
+            while (current) {
+                printf("Checking block at: %p with size: %lu (BESTFIT)\n", (void *)current, current->size);
+                if (current->size >= size) { // large enough
+                    if (!best_fit || current->size < best_fit->size) { // smaller size than the best_fit size
+                        best_fit = current; 
+                        best_prev_next = prev ? &prev->next : &_firstFreeBlock; // if not prev then its the firstFreeBlock
+                        printf("New best fit found at: %p with size: %lu\n", (void *)current, current->size);
+                    }
+                }
+                prev = current;
+                current = current->next;
+            }
+            selected_block = best_fit;
+            selected_prev_next = best_prev_next;
             break;
         }
         
@@ -351,9 +375,10 @@ void *my_malloc(uint64_t size)
                 _next_fit_cursor = _firstFreeBlock;
                 printf("Updated next_fit_cursor to: %p\n", (void *)_next_fit_cursor);
             }
-        }        
+        }    
         return allocate_call;
     }
+	return NULL;
 }
 
 
@@ -466,3 +491,42 @@ void setAllocationStrategy(AllocType type)
 	}
 }
 
+/* 
+Add a function that returns statistics about the free blocks:
+    • Number of free blocks
+    • Average size of free blocks (total free space / number of free blocks, truncated to int)
+    • Size of largest free block
+*/
+MallocStat getAllocStatistics()
+{
+    MallocStat stat;
+    stat.nFree = 0;
+    stat.avgFree = 0;
+    stat.largestFree = 0;
+
+    // current block to iterate through the free list
+    Block *current = _firstFreeBlock;
+    // variables
+    uint64_t total_free_space = 0;
+    uint64_t largest_free_block = 0;
+    // iterate through the free list
+    while (current) {
+        stat.nFree++; // increment the count of free blocks
+        // add the size of the current block to the total free space
+        total_free_space += current->size;
+        // update the largest free block size if the current block size is larger
+        if (current->size > largest_free_block) {
+            largest_free_block = current->size;
+        }
+        // move to the next block
+        current = current->next;
+    }
+    // calculate the average free space
+    if (stat.nFree > 0) {
+        stat.avgFree = total_free_space / stat.nFree;
+    }
+    // set the largest free block size
+    stat.largestFree = largest_free_block;
+    // return the statistics
+    return stat;
+}

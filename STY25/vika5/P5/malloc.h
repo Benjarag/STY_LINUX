@@ -44,9 +44,9 @@ void setAllocationStrategy(AllocType type);
 
 /* Allocation statistics structure */
 typedef struct mallocStat {
-	uint32_t nFree;      /* Number of free blocks */
-	uint32_t avgFree;    /* Average size of free blocks (truncated) */
-	uint32_t largestFree;/* Size of the largest free block */
+	uint32_t nFree;       /* Number of free blocks */
+	uint32_t avgFree;     /* Average size of free blocks (total free space / number of free blocks, truncated to int) */
+	uint32_t largestFree; /* Size of the largest free block */
 } MallocStat;
 MallocStat getAllocStatistics();
 

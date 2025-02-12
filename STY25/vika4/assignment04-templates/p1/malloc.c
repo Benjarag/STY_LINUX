@@ -306,3 +306,96 @@ void my_free(void *address)
 
     printf("my_free: Completed freeing block at address: %p\n", (void *)block_to_free);
 }
+
+
+
+
+
+/* 
+Add a function that returns statistics about the free blocks:
+    • Number of free blocks
+    • Average size of free blocks (total free space / number of free blocks, truncated to int)
+    • Size of largest free block
+*/
+MallocStat getAllocStatistics()
+{
+    MallocStat stat;
+    stat.nFree = 0;
+    stat.avgFree = 0;
+    stat.largestFree = 0;
+
+    // current block to iterate through the free list
+    Block *current = _firstFreeBlock;
+    // variables
+    uint64_t total_free_space = 0;
+    uint64_t largest_free_block = 0;
+    // iterate through the free list
+    while (current) {
+        stat.nFree++; // increment the count of free blocks
+        // add the size of the current block to the total free space
+        total_free_space += current->size;
+        // update the largest free block size if the current block size is larger
+        if (current->size > largest_free_block) {
+            largest_free_block = current->size;
+        }
+        // move to the next block
+        current = current->next;
+    }
+    // calculate the average free space
+    if (stat.nFree > 0) {
+        stat.avgFree = total_free_space / stat.nFree;
+    }
+    // set the largest free block size
+    stat.largestFree = largest_free_block;
+    // return the statistics
+    return stat;
+}
+
+
+// Testing the getAllocStatistics function
+int main() {
+    // Initialize the allocator.
+    initAllocator();
+    
+    printf("=== Initial free block statistics ===\n");
+    MallocStat stat = getAllocStatistics();
+    printf("Free blocks: %u\n", stat.nFree);
+    printf("Average free block size: %u\n", stat.avgFree);
+    printf("Largest free block size: %u\n", stat.largestFree);
+    
+    // Allocate some memory.
+    void *a = my_malloc(1000);
+    void *b = my_malloc(2000);
+    void *c = my_malloc(3000);
+    
+    printf("\n=== After allocations ===\n");
+    stat = getAllocStatistics();
+    printf("Free blocks: %u\n", stat.nFree);
+    printf("Average free block size: %u\n", stat.avgFree);
+    printf("Largest free block size: %u\n", stat.largestFree);
+    
+    // Free one block.
+    my_free(b);
+    
+    printf("\n=== After freeing block b (2000 bytes) ===\n");
+    stat = getAllocStatistics();
+    printf("Free blocks: %u\n", stat.nFree);
+    printf("Average free block size: %u\n", stat.avgFree);
+    printf("Largest free block size: %u\n", stat.largestFree);
+    
+    // Free the remaining blocks.
+    my_free(a);
+    my_free(c);
+    
+    printf("\n=== After freeing blocks a (1000 bytes) and c (3000 bytes) ===\n");
+    stat = getAllocStatistics();
+    printf("Free blocks: %u\n", stat.nFree);
+    printf("Average free block size: %u\n", stat.avgFree);
+    printf("Largest free block size: %u\n", stat.largestFree);
+    
+    return 0;
+}
+// gcc -g -W -Wall -Werror -std=c17 -o test_malloc malloc.c
+// ./test_malloc
+// Output:
+
