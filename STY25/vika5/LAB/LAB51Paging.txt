@@ -1,0 +1,71 @@
+Lab 5.1: Paging
+a. Explain the basic idea of paging.
+
+ 1. Paging dicides programs into fixed size pages.
+ 2. Paging is closer to Operating System.
+ 3. It suffers from internal fragmentation.
+ 4. Logical address is divided into page number and page offset page.
+ 5. Page table is used to maintiain the page information.
+ 6. Paging is invisible to user.
+ 7. Paging results in a lesss efficient system.
+
+
+b. How is a virtual address translated to a physical address using a single-level page table?
+
+ Using a single-level page table, the translation process involves:
+
+     Splitting the virtual address into VPN and page offset.
+
+     Using the VPN to index into the page table and retrieve the PFN.
+
+     Combining the PFN with the page offset to compute the physical address.
+
+
+c. What is the disadvantage of using single-level page tables?
+
+ This method is simple but can be inefficient for large address spaces, 
+ as the page table itself can become very large. Hierarchical page tables 
+ (e.g., multi-level page tables) are often used to address this issue hierarchically.
+
+
+d. Calculate the space requirements of a single-level page table for (1) a system with 32-bit
+   virtual addresses and (2) a system with 48-bit virtual addresses (current x86-64). Both
+   use a page size of 4 KiB. Assume that 4 bytes are required for a page table entry.
+
+ 4 KiB meaning == 2^12
+
+ (1) a system with 32-bit virtual addresses and
+    2^32-12 * 4 = 2^20 * 4 = 2^22 == 4 MiB
+ (2) a system with 48-bit virtual addresses (current x86-64)
+    2^48-12 * 4 = 2^36 * 4 = 2^38 == 1 TiB
+
+e. Let’s assume we have a 32 bit architecture with
+    • 1 GiB of physical RAM
+    • a theoretical maximum size of virtual memory of 2^32 byte = 4 GiB
+    • a page size of 8 KiB,
+    • 20 processes running,
+    • each with 256 MiB of allocated virtual memory;
+    • physical addresses, as well as page table entries, are 64 bit in size (8 byte)
+   (1) Calculate the total size of memory needed for a linear (one level) page table.
+    Each process has 256 MiB of virtual memory, with 8 KiB pages:
+        256 MiB/8 KiB = 256 * 2^20 / 8 * 2^10 = 2^28 / 2^13 = 2^15 = 32768 pages
+    page table entries are 64 bit, 8 bytes
+        32768 * 8 bytes = 256 KiB or 2^18
+    we have 20 processes so:
+        20 * 256 KiB = 5120 KiB => 5120/1024 = 5 MiB
+    he total memory required for a single-level page table is 5 MiB
+
+
+   (2) Calculate the total size of memory needed for the page table data structures using a
+   two-level page table. Assume that a single page directory with 2^9 entries and 2nd level
+   page tables pages with 2^10 entries are used, and no entries are shared among multiple
+   page tables.
+    Each process has a page directory with 512 entries, each 4 bytes:
+        512 entries * 8 bytes = 4096 = 4 KiB
+    Each second-level page table contains 1024 entries, each taking 8 bytes:
+        Size of One Second-Level Page Table => 1024 entries * 8 bytes = 8192 bytes = 8 KiB
+    With 512 second-level page tables, the total memory required is:
+        512 * 8 KiB = 4096 KiB = 4 MiB
+    Total memory for page tables = Page Directory Size + Total Second-Level Page Tables Size:
+        4 KiB + 4 MiB = 4 KiB + 4096 KiB = 4100 KiB 
+        => 4100/1024 = 4 MiB , approx.
