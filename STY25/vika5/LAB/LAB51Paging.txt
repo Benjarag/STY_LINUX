@@ -53,7 +53,7 @@ e. Let’s assume we have a 32 bit architecture with
         32768 * 8 bytes = 256 KiB or 2^18
     we have 20 processes so:
         20 * 256 KiB = 5120 KiB => 5120/1024 = 5 MiB
-    he total memory required for a single-level page table is 5 MiB
+    so the total memory required for a single-level page table is 5 MiB
 
 
    (2) Calculate the total size of memory needed for the page table data structures using a
