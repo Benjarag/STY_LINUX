@@ -1,0 +1,17 @@
+Lab 6.2: Page Replacement Basics
+a. The pager (e.g., kswapd on Linux) of some systems tries to always offer a certain amount
+of free page frames to improve paging. What is the basic idea behind such a pager?
+
+
+
+
+b. What is thrashing? When does it occur?
+
+
+
+
+c. What is the working set of a process? How can the working set be used to prevent
+thrashing?
+
+
+

@@ -1,0 +1,79 @@
+Lab 6.1: Page Fault Handling
+a. Explain the terms demand-paging and pre-paging. What are the respective strengths
+and weaknesses?
+
+Demand-Paging: Transfer only pages that raise page faults
+Demand-paging is a lazy-loading approach where the operating system loads pages into memory 
+only when they are actually needed—that is, when a page fault occurs
+Strengths:
+    memory efficiency: Only transfer what is needed
+    Less memory needed per process
+Weaknesses:
+    “Many” initial page faults when a task starts
+    More I/O operations fi More I/O overhead
+
+Pre-Paging: Speculatively transfer pages to RAM
+Pre-paging is a proactive approach where the OS speculatively loads additional pages into memory
+along with the one that triggered the page fault, based on an estimation of what the process might
+need next (e.g., loading an entire section of code).
+Strengths:
+    Improves disk I/O throughput by reading chunks
+Weaknesses:
+    Wasted resources: Wastes I/O bandwidth if page is never used
+    Interference with other processes: Can destroy the working set of other processes in case of page stealing
+
+
+b. When a thread touches (either reads or writes) a page for the first time with demand-
+paging, a page fault will occur. Classify the page fault according to where the data for
+the unmapped page has to be fetched from by the page fault handler.
+
+When a thread accesses a page for the first time under demand-paging, a page fault occurs. 
+The OS classifies this fault based on the source of the data for the unmapped page:
+Demand-Loaded Fault:
+    If the page is part of the program’s executable (code or initialized data), 
+    it is fetched from disk (or a memory-mapped file).
+Zero-Fill Fault:
+If the page is being accessed for the first time for dynamic memory (e.g., stack or heap), 
+a new page is allocated and filled with zeros.
+So, fault is handled either by loading existing data from disk or by initializing a new, empty page
+
+
+c. If the process has been running for some time, modifying data along its way, there is
+one additional case that needs to be covered on a page fault. Which?
+
+The additional case that needs to be covered on a page fault when a process has been running for some time
+and modifying data is handling a dirty page during page replacement.
+It checks if the victim page is dirty and, if so, writing it to disk before replacing it with the new page.
+
+
+d. Discuss which information is required by the page fault handler to correctly setup (or
+restore) the contents of accessed pages.
+
+The page fault handler requires:
+
+    Virtual address (from CR2 register) causing the fault.
+
+    Page Table Entry (PTE) metadata (validity, permissions, dirty bit, disk location if swapped).
+
+    Disk location (swap/pagefile or file backing) to restore the page.
+
+    Swap metadata (dirty status and disk location of victim pages for replacement).
+
+    Physical frame allocation (free frames or victim selection).
+
+    Page type (demand-zero, file-backed, anonymous) to initialize/load correctly.
+
+    Address space mappings to update/unmap pages and TLB entries to flush.
+
+
+e. Can you reuse page table entries to store some of this information? Is it a good idea?
+
+Yes, PTEs can store disk locations and metadata (e.g., dirty/accessed bits),
+but hardware support is critical.
+
+
+f. Recap: Describe the steps necessary to handle a page fault in an application’s address
+space.
+
+
+
