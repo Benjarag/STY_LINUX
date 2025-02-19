@@ -1,0 +1,10 @@
+==1036282== Lackey, an example Valgrind tool
+==1036282== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote.
+I  04001fb6,4
+I  04001fba,6
+I  04002100,3
+I  04002103,3
+ S 0422dca8,8
+ L 0422ce60,8
+ L 1fff0002c0,8
+==1036282== Exit code:       0

@@ -2,16 +2,25 @@ Lab 6.2: Page Replacement Basics
 a. The pager (e.g., kswapd on Linux) of some systems tries to always offer a certain amount
 of free page frames to improve paging. What is the basic idea behind such a pager?
 
+The basic idea is to proactively maintain a pool of free, pre-cleaned page frames so that when
+a page fault occurs, the system can immediately allocate a frame without the delay of cleaning
+or swapping out a page. This reduces page fault latency and improves overall system performance.
 
 
 
 b. What is thrashing? When does it occur?
 
-
+Thrashing: The system is busy swapping pages in and out
+Each time one page is brought in, another page, whose contents will soon be referenced, is
+thrown out
+Effect: Low CPU utilization, processes wait for pages to be fetched from disk
+Consequence: OS “thinks” that it needs higher degree of multiprogramming [SGG12]
 
 
 c. What is the working set of a process? How can the working set be used to prevent
 thrashing?
 
-
-
+Working set of a process: The set of pages that a process actively needs in a given 
+time window to execute efficiently without excessive page faults.
+Preventing thrashing using the working set:
+The working set model ensures that each process gets enough page frames to hold its working set.

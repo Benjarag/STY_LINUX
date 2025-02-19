@@ -75,5 +75,14 @@ but hardware support is critical.
 f. Recap: Describe the steps necessary to handle a page fault in an application’s address
 space.
 
-
-
+1. Access to page that is currently not present in main physical memory causes page fault
+2. OS traps, checks validity of access
+3. The OS selects an empty frame (free or victim)
+4. Page prepartaion: Demand-Loaded: If the page exists on disk 
+  (e.g., in the executable or a memory-mapped file), it is loaded into the allocated frame.
+  , Zero-Fill: If the page is new (e.g., for heap/stack), the frame is filled with zeros. 
+  and swapped: If the page was swapped out, it is read from the swap area.
+5. The OS updates the page table entry to map the virtual page to the new physical frame, 
+  marking it as present (valid) and setting proper access permissions.
+6. The Translation Lookaside Buffer (TLB) is updated (or flushed) as needed, 
+   and the faulting instruction is restarted.

@@ -1,0 +1,3 @@
+/home/benja/STY_LINUX/STY25/vika6/P6/assignment06-templates/p1/trace-compile.txt
+ 1949634  3899327 27638052 trace-compile.txt
+95aa6251a8eb9cb7fdacf9e0d803e157  trace-compile.txt
