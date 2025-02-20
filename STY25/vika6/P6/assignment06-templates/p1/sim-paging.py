@@ -105,10 +105,10 @@ def run_simulations(page_access_list, policies=['FIFO', 'LRU', 'OPT']):
     results = {policy: [] for policy in policies}
 
     for memory_size in memory_sizes:
-        print(f"Running simulations for memory size {memory_size}")
+        # print(f"Running simulations for memory size {memory_size}")
         for policy in policies:
             faults = simulate_page_replacement(page_access_list, memory_size, policy)
-            print(f"Policy {policy}, faults: {faults}")
+            # print(f"Policy {policy}, faults: {faults}")
             results[policy].append(faults)
     return memory_sizes, results
 
