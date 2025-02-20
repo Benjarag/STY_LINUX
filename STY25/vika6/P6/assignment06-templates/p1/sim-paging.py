@@ -69,13 +69,12 @@ def export_page_trace(page_access_list, output_file):
 
     return new_page_acess_list
 
-def simulate_page_replacement(page_access_list, memory_size, policy):
+def simulate_page_replacement(file, memory_size, policy):
     '''
     Calls the paging-policy executable to simulate page replacement.
     Returns the number of page faults.
     '''
-    page_list_str = ",".join(map(str, page_access_list)) # convert the list to a comma-separated string
-    args = ['./paging-policy.py', '-a', page_list_str, '-C', str(memory_size), '-p', policy, '-c']
+    args = ['./paging-policy.py', '-f', file, '-C', str(memory_size), '-p', policy, '-c']
     try:
         result = subprocess.run(args, capture_output=True, text=True, check=True) # run the paging-policy executable
         output = result.stdout.strip() # get the output
@@ -90,25 +89,32 @@ def simulate_page_replacement(page_access_list, memory_size, policy):
         print(f"Error running paging-policy: {e}")
         return None
 
-def run_simulations(page_access_list, policies=['FIFO', 'LRU', 'OPT']):
+def run_simulations(trace_file, policies=['FIFO', 'LRU', 'OPT']):
     '''
     For each physical memory size, and each replacement policy, run the simulation to get the number of page faults.
     Return a list of physical memory sizes tested, and a dictionary mapping each policy to a list of page fault counts for each physical memory size.
     '''
-    unique_pages = set(page_access_list)
+    # Read the deduplicated trace from the file
+    with open(trace_file, 'r') as f:
+        page_list = [int(line.strip()) for line in f if line.strip()]
+
+    unique_pages = set(page_list)
     num_unique_pages = len(unique_pages) 
+    print(f"Number of unique pages (inside the run_simulations function): {num_unique_pages}")
 
 
-    # list of physical memory sizes
-    memory_sizes = list(range(1, num_unique_pages+1))
-    # dictionary to store the results, with policy as key and list of page faults as value
+    # To avoid an enormous x-axis, we sample the memory sizes.
+    # For instance, if num_unique is large, use increments of 10.
+    if num_unique_pages > 100:
+        step = 50
+    else:
+        step = 1
+    memory_sizes = list(range(1, num_unique_pages+1, step))
+    
     results = {policy: [] for policy in policies}
-
-    for memory_size in memory_sizes:
-        # print(f"Running simulations for memory size {memory_size}")
+    for mem_size in memory_sizes:
         for policy in policies:
-            faults = simulate_page_replacement(page_access_list, memory_size, policy)
-            # print(f"Policy {policy}, faults: {faults}")
+            faults = simulate_page_replacement(trace_file, mem_size, policy)
             results[policy].append(faults)
     return memory_sizes, results
 
@@ -144,15 +150,18 @@ def plot_memory_access(page_access_list, png_file=None, instruction_page_set=Non
 
 
 if __name__ == "__main__":
-    pages, instructions = get_page_list("test.log")
-    print("Page Access List:", pages)
+    pages, instructions = get_page_list("trace-compile.txt")
+    print("Total number of pages in original list:", len(set(pages)))
+    print("Page Access List:", pages[:20], "...")  # print first 20 for brevity
     print("Instruction Pages:", instructions)
     # testing the export_page_trace function
-    new_list = export_page_trace(pages, "output.txt")
+    deduped = export_page_trace(pages, "output.txt")
+    unique_after = len(set(deduped))
+    print("Unique pages after deduplication:", unique_after)
     # printing the ouput of export_page_trace
-    print("New Page Access List:", new_list)
+    # print("New Page Access List (deduplicated):", new_list[:20], "...")
     # testing the simulate_page_replacement function
-    memory_sizes, results = run_simulations(new_list, ['FIFO', 'LRU', 'RAND','OPT'])
+    memory_sizes, results = run_simulations("output.txt", ['FIFO', 'LRU', 'RAND','OPT'])
     print("Simulation results:", results)
     plot_results(memory_sizes, results, "simresult.png")
     print("Plot created")
