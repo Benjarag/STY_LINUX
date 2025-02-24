@@ -100,13 +100,12 @@ def run_simulations(trace_file, policies=['FIFO', 'LRU', 'OPT']):
 
     unique_pages = set(page_list)
     num_unique_pages = len(unique_pages) 
-    print(f"Number of unique pages (inside the run_simulations function): {num_unique_pages}")
 
 
     # To avoid an enormous x-axis, we sample the memory sizes.
     # For instance, if num_unique is large, use increments of 10.
     if num_unique_pages > 100:
-        step = 50
+        step = 15
     else:
         step = 1
     memory_sizes = list(range(1, num_unique_pages+1, step))
@@ -156,8 +155,8 @@ if __name__ == "__main__":
     print("Instruction Pages:", instructions)
     # testing the export_page_trace function
     deduped = export_page_trace(pages, "output.txt")
-    unique_after = len(set(deduped))
-    print("Unique pages after deduplication:", unique_after)
+    # unique_after = len(set(deduped))
+    # print("Unique pages after deduplication:", unique_after)
     # printing the ouput of export_page_trace
     # print("New Page Access List (deduplicated):", new_list[:20], "...")
     # testing the simulate_page_replacement function
