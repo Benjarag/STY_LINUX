@@ -1,0 +1,79 @@
+a. Describe the principle and the benefits of a memory hierarchy. How can a memory hi-
+erarchy provide both fast access and large capacity? On what typical program behavior
+does it depend?
+
+The memory hierarchy leverages different memory types (registers, SRAM, DRAM, disk) to balance speed, size, and cost. 
+Faster, smaller memories (e.g., caches) provide quick access, 
+while slower, larger memories (e.g., disk) offer capacity.
+This works due to locality:
+    Temporal locality: Recently accessed data is likely to be reused.
+
+    Spatial locality: Accessing a memory location implies nearby locations will be accessed soon.
+    By caching frequently used data in faster layers, the hierarchy ensures fast access while maintaining large storage capacity (pages 13, 18).
+
+
+b. Cache memory is divided into (and loaded in) blocks, also called cache lines. Why is a
+cache divided into these cache lines? What might limit the size of a cache line?
+
+Why? Programs often use data that’s close together (like elements in an array). 
+Loading a block (cache line) instead of one byte at a time reduces trips to slow main memory. 
+This is called spatial locality.
+What Limits Cache Line Size?
+    Fixed Cache Capacity
+    Memory Bus Width, larger lines mean more transfers → slower fills, wasting time.
+    The CPU chip has limited physical space,  Larger lines take up more transistors, leaving less room
+    Each line needs metadata (tags, valid/dirty bits). More lines = more tags. Larger lines reduce tag count but waste space if data isn’t used
+
+
+c. Enumerate and explain the different kinds of cache misses.
+
+Compulsory miss
+    Cold start, first reference to a block
+    Data block was not cached before
+Capacity miss
+    Not all required data fits into the cache, (cache to small)
+    Accessed data was previously evicted to make room for different data
+Conflict miss
+    Collision, interference
+    Depending on the cache organization, data items interfere with each other
+    Fully associative caches are not prone to conflict misses
+
+
+d. Explain the difference between the write-through and write-back strategy.
+
+Cache hit
+    Write-through
+        Main memory is always up-to-date
+        Writes may be slow
+    Write-back
+        Data is written only to the cache
+        Main memory temporarily inconsistent
+        Faster but requires dirty-bit tracking
+
+
+e. How can writes to a data item that is currently not in the cache be handled?
+
+Cache miss
+    Write-allocate:
+        To-be-written data item is read from main memory into the cache
+        Write performed afterwards according to the write policy
+        Other answer: Load the block into the cache, then update it. Common with write-back caches.
+    Write-to-memory:
+        Modification is performed only in main memory
+        Write directly to main memory, bypassing the cache. Often used with write-through
+
+f. What are the two main problems that can arise with caches that are virtually-indexed
+and virtually-tagged? What can be done to avoid or solve these problems?
+
+Ambiguity: Identical virtual addresses point to different physical addresses at different points in time.
+
+Alias: Different virtual addresses point to the same physical memory location address, causing duplicate cache entries.
+Solutions: Flush/invalidate caches during context switches, disallow aliases, or use physical tags.
+
+
+g. Does using virtually-indexed, physically-tagged caches solve the two problems described
+in the previous question?
+
+VIPT caches solve ambiguity by using physical tags to distinguish addresses. 
+The alias problem is mitigated since shared physical pages map to the same tag, but virtual indexing may still cause conflicts.
+However, the physical tag ensures correctness, and shared memory requires alignment to avoid conflicts.
