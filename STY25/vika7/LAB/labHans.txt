@@ -1,0 +1,35 @@
+a. Describe the principle and the benefits of a memory hierarchy. How can a memory hi-
+erarchy provide both fast access and large capacity? On what typical program behavior
+does it depend?
+
+
+
+
+b. Cache memory is divided into (and loaded in) blocks, also called cache lines. Why is a
+cache divided into these cache lines? What might limit the size of a cache line?
+
+
+
+
+c. Enumerate and explain the different kinds of cache misses.
+
+
+
+
+d. Explain the difference between the write-through and write-back strategy.
+
+
+
+
+e. How can writes to a data item that is currently not in the cache be handled?
+
+
+
+f. What are the two main problems that can arise with caches that are virtually-indexed
+and virtually-tagged? What can be done to avoid or solve these problems?
+
+
+
+
+g. Does using virtually-indexed, physically-tagged caches solve the two problems described
+in the previous question?
