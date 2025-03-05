@@ -1,0 +1,57 @@
+Lab 8.2: Race Conditions
+
+a.  Explain the term race condition with this scenario: Two people try to access a bank
+    account simultaneously. One person tries to deposit 100 Euros, while another wants
+    to withdraw 50 Euros. These actions trigger two update operations in a central bank
+    system. Both operations run in “parallel” on the same computer, each represented by a
+    single thread executing the following code:
+    current = get balance ( ) ;
+    current += delta ;
+    set balance ( current ) ;
+    where delta is either 100 or −50 in our example.
+
+Incorrect result occurs because we are updating the current with delta after we get the balance and read it,
+when we run simultaneously this does not work, since they don’t see each other's updates,
+one of the changes gets lost. This is the core of a race condition.
+
+
+b.  Determine the lower and upper bounds of the final value of the shared variable tally as
+    printed in the following program:
+
+const int N = 50;
+int tally;
+
+void total()
+{
+    for (int i = 0; i < N; ++i)
+        tally += 1;
+}
+
+int main() 
+{
+    tally = 0;
+
+    #pragma omp parallel for
+    for (int i = 0; i < 2; ++i)
+        total();
+
+    printf("%d\n", tally);
+    return 0;
+}
+
+Note: The #pragma tells the compiler to create code to run parallel threads for each loop
+step. Assume that threads can execute at any relative speed and that a value can only be
+incremented after it has been loaded into a register by a separate machine instruction.
+
+
+The lower bound is 50 (if one thread's updates are completely lost).
+The upper bound is 100 (if no increments are lost, which is unlikely).
+The actual result will be somewhere in between, depending on thread scheduling.
+
+
+c.  Suppose that an arbitrary number t > 2 of parallel threads are performing the above
+    procedure total. What (if any) influence does the value of t have on the range of the
+    final values of tally?
+
+if t is a large amount, it would be more likely that threads updates are lost
+if t is closer to 2 it woulf be less likely.

@@ -1,0 +1,39 @@
+Lab 8.3: Pipes
+
+a.  Use cases for (anonymous) pipes: The pipe system call creates a pipe (in form of a pair of
+    file descriptors) within the same process. For what kind of applications can you imagine
+    that such an IPC channel can be useful? Do you know any application that you have
+    recently used and that uses this IPC mechanism?
+    (You have seen examples of this in class)
+
+Use Cases for Anonymous Pipes
+    Parent-Child Process Communication: Used in shells (ls | grep txt).
+    Producer-Consumer Model: One process writes, another reads (e.g., compilers).
+    Logging & Debugging: Redirect logs between processes.
+
+Example:
+    Shell pipelines: ps aux | grep firefox | awk '{print $2}' use pipes for process communication.
+
+
+b.  If you run this command in a Linux shell cat Makefile | wc
+    Can you explain this command line, and how it relates to the IPC mechanism of pipes?
+    (You should also remember similar examples from class)
+
+Linux shell command:
+cat Makefile | wc
+    30      70     549
+
+The command cat Makefile | wc uses a pipe (|) to connect two processes:
+1. cat Makefile, reads and outputs the content of Makefile.
+2. The pipe | redirects this output to wc.
+wc (word count) processes the input and prints three numbers:
+    30 -> lines
+    70 -> words
+    549 -> bytes
+    
+Relation to IPC (Inter-Process Communication)
+    The pipe is an anonymous pipe, allowing one-way communication between cat and wc.
+    The shell creates the pipe, making wc read from the standard output of cat.
+    This is an example of Producer-Consumer IPC, where cat (producer) sends data, and wc (consumer) processes it.
+
+

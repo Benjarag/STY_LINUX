@@ -1,0 +1,38 @@
+Lab 8.1: Interprocess Communication (IPC)
+
+a.  How can concurrent tasks (threads, processes) interact in a (local) system?
+    (This is basic repetition of class material)
+
+Concurrent tasks interact via:
+    Shared Memory (threads): Direct access to shared data (needs mutexes/semaphores).
+    Message Passing (processes): OS-mediated (e.g., pipes, sockets, POSIX queues).
+    Signals: Notify events (e.g., SIGINT).
+    Synchronization: Barriers/condition variables coordinate actions.
+
+Threads: Fast (shared memory) but risk race conditions.
+Processes: Safer (isolation) but slower (kernel overhead).
+Example: Threads use pthread_mutex_lock(); processes use pipe().
+
+
+b.  Asynchronous send operations require a buffer for sent messages that are not yet received
+    by the other endpoint. Discuss possible locations for this message buffer and evaluate them.
+    (We did not discuss this in class in depth. Be creative, consider all OS abstractions / concepts we have
+    discussed so far, and discuss in the lab session)
+
+Possible buffer locations:
+    Kernel Space:
+        Pros: Safe, OS-managed (e.g., pipes, POSIX queues).
+        Cons: Slower (syscalls, context switches).
+    User Space:
+        Pros: Faster (no kernel involvement).
+        Cons: Risk of data loss if process crashes.
+    Hardware Buffers:
+        Pros: Efficient for NICs (e.g., network sockets).
+        Cons: Limited size, hardware-dependent.
+
+Evaluation:
+    Kernel buffers ensure reliability but add overhead.
+    User buffers optimize speed but lack fault tolerance.
+    Hybrid approaches (e.g., kernel-managed shared memory) balance safety and performance.
+
+Example: Mach OS used kernel-managed mailboxes with bounded buffers for async messaging.

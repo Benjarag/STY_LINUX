@@ -189,4 +189,3 @@ int main(int argc, char *argv[]) {
         munmap(dump_base, dump_size);
     return EXIT_SUCCESS;
 }
-
