@@ -1,0 +1,55 @@
+Lab 9.1: Critical Sections
+
+a. Explain the term critical section.
+(This is basic repetition of class material)
+
+A critical section is a segment of code that accesses shared resources 
+(such as variables, data structures, or devices) that must not be concurrently 
+executed by more than one thread or process. If multiple threads enter this 
+section at the same time without proper coordination, race conditions can occur,
+potentially corrupting shared data.
+-> protect critical section from concurrent execution
+
+
+b. Explain the two core requirements that a valid synchronization primitive for critical
+sections has to fulfill. Furthermore explain additional desirable properties.
+(This is basic repetition of class material)
+
+Mutual Exclusion
+At most one thread can be in the CS at any time
+
+Progress
+No thread running outside of the CS may block another thread from getting in
+If no thread is in the CS, a thread trying to enter will eventually get in
+If no thread can enter CS -> don’t have progress
+
+Bounded Waiting/Fairness
+Once a thread starts waiting to enter the critical section, 
+there should be a limit on the number of times other threads can enter before
+that waiting thread gets its turn. This prevents starvation.
+
+Performance
+The synchronization mechanism should impose minimal overhead, 
+both in the uncontended case (when no other thread is waiting) 
+and when contention is present, to avoid unnecessary delays.
+
+
+c. Recap the banking example from the previous question. How could the race condition
+be avoided?
+current = get balance ( ) ;
+current += delta ;
+set balance ( current ) ;
+
+To avoid this Critical Section we can use a synchronization mechanism
+to ennsure that the entire sequence is executed atomically by only one thread at a time
+
+for example:
+lock(mutex);
+current = get_balance ();
+current += delta;
+set_balance (current);
+unlock(mutex);
+
+by using a lock, we ensure that once a thread begins updating the balance, 
+no other thread can read or modify it until the lock is realeased,
+this is how we keep the consistency of the balance correct

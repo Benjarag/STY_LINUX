@@ -1,0 +1,38 @@
+Lab 9.3: Producer-Consumer Problem
+
+a. Solve the producer-consumer problem for the following buffer using a single pthread
+mutex and two semaphores:
+#define BUFFER_SIZE 10
+int buffer [BUFFER_SIZE];
+int index = 0; // Current element in buffer
+
+b. Assume you have only a single producer and a single consumer. Can you simplify the
+code from part (a) in that case?
+
+
+c. Assume you have modified the code such that only two semaphores are used, but the
+mutex lock has been removed from the solution of part (a). What can go wrong now, if
+you have a single consumer, but multiple producers?
+
+Race Conditions on Shared Data:
+Without the mutex, multiple producers can concurrently pass the sem_wait(&empty) 
+check and attempt to update the shared variable index and write into the buffer simultaneously.
+This can lead to:
+    Incorrect Index Updates: 
+    Two producers might read the same value of index before either updates it,
+    causing one item to be overwritten or an incorrect count of produced items.
+    Buffer Corruption: 
+    The lack of mutual exclusion means that the shared buffer array may be written inconsistently, 
+    resulting in lost data or corrupt buffer entries.
+
+Inconsistent State:
+Since operations on index and the buffer are not atomic (they involve multiple steps),
+the interleaving of operations from different producers can leave the shared data in
+an unpredictable state.
+
+Summary:
+The mutex is essential when you have multiple producers (or consumers) 
+because it guarantees that updates to shared variables (like index)
+and access to the buffer occur in a mutually exclusive manner.
+Without it, the semaphores only control the availability of slots/items
+but not the atomicity of the operations that update shared state.

@@ -1,0 +1,90 @@
+Lab 9.2: Synchronization Primitives
+
+a. Distinguish the various types of synchronization objects and summarize their respective
+operations’ semantics: spinlocks, counting semaphores, binary semaphores, and mutex
+objects. (This is basic repetition of class material)
+
+Spinlocks:
+These are low-level locks that rely on busy-waiting.
+A thread repeatedly checks if the lock is free (spinning) until it can acquire it.
+They are efficient if the lock hold time is very short and the thread remains 
+on the same processor core, but they waste CPU cycles when contention is high.
+
+Counting Semaphores:
+A semaphore maintains an internal counter that represents available resources. 
+Its two primary operations are:
+    Wait (P): Decrement the counter; 
+    if the counter is zero, the thread blocks until a resource is available.
+    Signal (V): Increment the counter; 
+    if there are waiting threads, one is awakened.
+Counting semaphores are useful when managing access to a pool of identical resources.
+
+Binary Semaphores:
+Essentially a special case of counting semaphores with a maximum count of 1. 
+They provide mutually exclusive access 
+(only one thread can hold the semaphore at any time) 
+but do not typically include the ownership semantics 
+(i.e., the thread that acquires the semaphore isn’t necessarily required to
+be the one that releases it).
+
+Mutex Objects:
+Mutexes are designed specifically for mutual exclusion, 
+ensuring that only one thread can enter a critical section at a time.
+They often include additional features like blocking 
+(so a thread sleeps if it cannot acquire the lock)
+and may enforce ownership rules (only the thread that locks the mutex may unlock it).
+Some mutexes can be created as reentrant (or recursive), 
+allowing the same thread to lock the mutex multiple times without deadlocking.
+
+
+
+b. The following code causes a deadlock. (You find the code on canvas – test it on your
+own!). Try to explain why!
+
+#include <pthread.h>
+pthread mutex t lock;
+int value = 10;
+
+void initialize () {
+    pthread mutex init(&lock, NULL);
+}
+
+void dosomethingelse() {
+    pthread mutex lock(&lock);
+    if (value==100) { 
+        value = 52; 
+    }
+    pthread mutex unlock(&lock);
+}
+
+void dosomething() {
+    pthread mutex lock(&lock);
+    value = value + 10;
+    dosomethingelse();
+    value = value − 10;
+    pthread mutex unlock(&lock);
+}
+
+int main() {
+    initialize ();
+    dosomething();
+}
+
+Why it deadlocks:
+    In dosomething(), the thread acquires the mutex using pthread_mutex_lock(&lock).
+    While still holding the lock, it calls dosomethingelse().
+    Inside dosomethingelse(), the code attempts to acquire the same mutex again by calling pthread_mutex_lock(&lock).
+    Since the mutex is non-reentrant (the default type), the thread is blocked waiting for itself to release the mutex. 
+    However, because it is waiting, it never reaches the point where it would unlock the mutex.
+    This situation results in a deadlock, where the thread is stuck waiting for a lock it already holds.
+
+
+
+c. How can this problem be solved (in a way such that all access to value is still protected
+by a mutex)?
+This is a problem that was not covered in class. Explore on your own the difference
+between a reentrant and a non-reeentrant mutex, and the corresponding pthreads API!
+Draft a sample solution in C code!.
+
+
+
