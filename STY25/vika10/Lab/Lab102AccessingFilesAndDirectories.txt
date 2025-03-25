@@ -1,0 +1,87 @@
+a. Absolute and relative path name:
+An absolute path name starts at the root of the directory structure, whereas a relative
+path name defines a path starting from the current directory. The current directory is
+normally process-specific and called working directory.
+Assume you have just logged in into the sty server. Can you write two different abso-
+lute and two different relative paths to your ssh authorized keys file? (this is file called
+authorized keys and is located in the .ssh subfolder.)
+
+Absolute paths (starting from root):
+benjaminr23@sty:/$ cd home/benjaminr23/.ssh/
+benjaminr23@sty:~/.ssh$
+
+benjaminr23@sty:/$ cd home/../home/benjaminr23/.ssh/
+benjaminr23@sty:~/.ssh$
+
+Relative paths (starting from home directory):
+benjaminr23@sty:~$ cd ./.ssh/
+benjaminr23@sty:~/.ssh$ 
+
+benjaminr23@sty:~$ cd .ssh/
+benjaminr23@sty:~/.ssh$
+
+
+b. What system calls do you need to list the files in a directory in Linux? Implement a
+simple function that prints all file names in the current directory!
+Note: This will be a essential building lock for the assignment P10!
+
+System calls needed are, opendir(), readdir() and closedir()
+
+solution:
+Lab102AccessingFilesAndDirectoriesb.c
+
+
+c. What is an access control list (ACL)? What problems can occur within ACLs, and how
+can these problems be solved?
+Create a file hello.txt on the server in your home directory and add a ACL to your home
+and to that file such that your group partner (or some other student in the lab class)
+gets access to that file, but nobody else!
+
+An ACL is a list bound to a file f, containing all individual subjects & their individual
+permissions how to access this file f.
+
+Problems within ACLs:
+    Complexity in managing multiple entries
+    Inheritance issues (e.g., new files not inheriting ACLs)
+    Security risks if misconfigured
+
+commands:
+Create file
+touch hello.txt
+
+Set ACLs
+setfacl -m user:sindrib23:r ~/hello.txt
+
+Restrict access for others
+chmod 700 ~
+chmod 600 ~/hello.txt
+
+
+d. In Linux and Windows, random access on files is implemented via a special system call
+that moves the “current position pointer” associated with a file to a given position in the
+file. What are the names of these system calls in Windows and Linux?
+
+Linux: lseek()
+Windows: SetFilePointer() or SetFilePointerEx()
+first one for 32 bit the other for 64 bit
+
+
+e. You can use the seek system call to create sparse files: If you seek to a position beyond
+the end of a file (and if the file system implementation supports sparse files), then the
+skipped part may remain as a ’hole’ without allocated disk storage. Verify this with a
+short sample program that creates a new file, seeks the position of 1 GiB after the start,
+writes a single byte, closes the file, and then checks the file size (total size, and block
+size on disk) using the stat system call.
+Note: This will be a second essential building lock for the assignment P10!
+
+Solution:
+Lab102AccessingFilesAndDirectoriesE.c
+
+// gcc Lab102AccessingFilesAndDirectoriesE.c -o sparse_file
+// ./sparse_file
+// Size: 1073741824 bytes
+// Blocks: 8 (512B each)
+// ls -lh sparse.bin
+// -rw-r--r-- 1 benjaminr23 benjaminr23 1.0G Mar 18 18:35 sparse.bin
+// du -h sparse.bin
+// 4.0K    sparse.bin

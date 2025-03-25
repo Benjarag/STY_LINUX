@@ -1,0 +1,109 @@
+a. Intro: What are hard links?
+In the following tasks, you will explore some details about files and directory, in particular
+the difference between hard and soft links on Unix systems.
+    • Each directory entry is a hard link; hard links simply map a name to an inode more
+        on inodes later in the lecture. inodes basically identify where on disk a file is stored,
+        i.e. they represent the content of a file. If you create a file f and a hard link l to the
+        file f , then f and l are indistinguishable. It is useless to argument that l is a hard
+        link to f ; rather both names f and l are hard links to the file represented by the
+        inode both of them map to.
+        Note: Hard links are thus implemented through the actual file system, not on the
+        higher virtual file system (VFS) layer. A hard link is possible only within a single
+        actual file system, not across moint points of different file systems.
+        inodes (index nodes) are blocks managed by a file system implementation that con-
+        tain all metadata about a file such as ownership, permissions, timestamps, and
+        location of the file data on disk (details depend on the implementation).
+    • Symbolic links are files of type “symbolic link”. Their content is interpreted by the
+        VFS layer and consists only of the relative or absolute path of the “pointed to” file.
+        For symbolic links, stating that l is a (symbolic) link to f is fine: l is the link, its
+        contents is “f ”. Differing from hard links, this relation is not symmetric: Generally
+        f is not a (symbolic) link to l (although this is possible!). Symbolic links can refer to
+        anywhere across different mount points, and even to non-existing files.
+        Symbolic links can circumvent two restrictions of hard links:
+        First, hard links can only link files within a single partition, as they refer to inode
+        numbers, which are local to a partition. With symbolic links, you can easily link
+        files across partitions and even across filesystems: You can create a symbolic link
+        on an ext3 partition, which points to a file on a VFAT partition (which does not even
+        use inodes nor support links in our sense).
+        Second, no user is allowed to create hard links to directories. If this were allowed,
+        you could create loops in the directory structure (“ln . foo” would make “.”, “foo”,
+        “foo/foo”, and “foo/foo/foo”, etc. all point to the current directory). As a conse-
+        quence, all directory traversal tools would need to keep track of all inodes of direc-
+        tories already visited. Simply forbidding such hard links and not following symbolic
+        links during traversals circumvents this problem.
+        A third advantage of symbolic links is their asymmetry: While hard links never
+        convey another name for the file, symbolic links state “the” other name of the file
+        they point to. This often makes understanding the directory structure easier.
+
+Hard links are directory entries that map a name to an inode 
+(a data structure storing file metadata and disk location).
+    All hard links that exist to the same inode are indistinguishable and deleting one does 
+     not affect the others until all links are removed.
+    Restricted to a single filesystem (canot cross partition).
+Symbolic links (soft links) are files containing a path to another file/directory.
+    Can cross filesystems and point to non-existent files.
+    Broken if the target is moved or deleted.
+
+
+b. Suppose you want to create a file f , a hard link h to the same file, and a symbolic link
+    s to f . How would you create such links on GNU/Linux? Consult the “ln” manpage and
+    test on your (Linux) computer or remotely on the sty server!
+
+Create a file:
+touch file
+
+Create hard link h to f
+ln f h
+
+symbolic link s to f
+ln -s f s
+
+if we look at this with the command, 
+ls -li:
+1835380 -rw-r--r-- 2 benjaminr23 benjaminr23       0 Mar 18 16:12 f
+1835380 -rw-r--r-- 2 benjaminr23 benjaminr23       0 Mar 18 16:12 h
+1835382 lrwxrwxrwx 1 benjaminr23 benjaminr23       1 Mar 18 16:12 s -> f
+
+Here we can see that h and f have the same inode 1835380 and 
+s -> f indicating it is a symbolic link.
+
+
+c. Suppose you have created a file f , a hard link h to the same file, and a symbolic link s
+    to f . What happens if you rename f to g? Is the file still accessible via the hard link h?
+    How about the symbolic link s? (Try answering first, then verify experimentally.)
+
+Renaming f to g
+mv f g
+
+cat h
+gives nothing, so it is still there and valid. It points to the original inode
+
+cat s
+gives cat: s: No such file or directory which means it failed and isnt linked.
+It points to the name f, which no longer exists.
+
+
+d. Would the same be true if you had copied f to g first and then removed f ?
+
+Hard link h: Still valid. Points to the original inode (data exists as long as h exists).
+
+Symbolic link s: Broken (points to f, which is removed).
+
+g is another inode now, because we only copied it
+
+cp f g      # Copy f to g (new inode)
+rm f        # Remove f
+cat h       # Success (original data via h)
+cat g       # Success (copied data, independent of h)
+cat s       # Fails: "No such file or directory"
+
+
+e. What happens if you now create a new file f ?
+
+now Hard link h: Still points to the original inode (old data).
+Symbolic link s: Now valid again, pointing to the new f.
+but the new f inode is now something else: 1835384
+
+touch f     # Create new f (new inode)
+cat s       # Success (points to new f)
+cat h       # Success (original data, unrelated to new f)
