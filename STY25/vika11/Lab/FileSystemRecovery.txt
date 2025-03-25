@@ -1,0 +1,58 @@
+Lab 11.1: File System Recovery
+
+a. Suppose your bitmap or list of free disk blocks has been corrupted due to a system
+crash. Is it possible to recover from this situation? Discuss in detail how – or why not –
+this is possible.
+
+Yes, recovery is possible. Steps:
+
+Create a new empty bitmap
+Scan all file system metadata (inodes, directories)
+Mark all blocks referenced by files as "in use"
+Mark remaining blocks as "free"
+This process is part of file system consistency checks (e.g., fsck), file system check, 
+enabling reconstruction of the free list/bitmap.
+
+
+b. Assume you have a file system with indexed allocation and the following parameters:
+• inode contains 10 direct blocks, 1 single-indirect block, 1 double-indirect block
+• block size is 2048 bytes (2 KiB), and block numbers are stored as 32-bit number (4 byte)
+
+(a) What is the maximum file size (in KiB) that can be stored using only direct blocks?
+10 direct blocks × 2 KiB/block = 20 KiB
+
+(b) What is the maximum file size (in KiB) that can be stored using the direct blocks
+    and the single-indirect block?
+Single-indirect block holds 2048 bytes4 bytes/block=5124 bytes/block2048 bytes​=512 pointers.
+Single-indirect contribution: 512×2 KiB=1024 KiB512×2 KiB=1024 KiB.
+Total: 20 KiB+1024 KiB=∗∗1044 KiB20 KiB+1024 KiB=∗∗1044 KiB.
+
+(c) What is the maximum file size (in KiB) that can be stored on that file system?
+Double-indirect block: 512×512×2 KiB=524,288 KiB512×512×2 KiB=524,288 KiB.
+Total: 20+1024+524,288=∗∗525,332 KiB20+1024+524,288=∗∗525,332 KiB.
+
+
+c. Assume you have a file system with indexed allocation, storing allocation information as
+extents.
+• Each extent is 48 bit physical block number and a 16 bit extent size (in blocks).
+• Block size is 4096 byte.
+• An inode contains information about four extents.
+
+(a) What is the maximum file size (in KiB) that can be stored by a single file under those
+    assumptions?
+Each extent can span 216−1=65, ⁣535216−1=65,535 blocks.
+Each block = 4096 bytes (4 KiB).
+Total size per extent: 65, ⁣535×4 KiB=262, ⁣140 KiB65,535×4 KiB=262,140 KiB.
+With 4 extents: 4×262, ⁣140=∗∗1, ⁣048, ⁣560 KiB∗∗4×262,140=∗∗1,048,560 KiB∗∗
+
+(b) Inspired by the ext4 file system: Assume that the inode can also specify for each
+    of the four extent items in the inode whether it is actually a “direct extend” (as
+    assumed so far), or an extent index (pointing to a disk block that contains additional
+    extents (as many as fit into a single block). What is the maximum file size now?
+
+Extent index: a block storing additional extents
+If all 4 are extent indexes, each index block holds 4096 bytes/8 bytes
+8 bytes, because 48 bits + 16 bits = 64 bits.
+4096/8 = 512
+each indexed block contributes 512*65535*4 KiB = 124215680 KiB
+4 extens would be, 4 * 124215680 = 536862720 KiB
